@@ -31,30 +31,6 @@
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
-              <el-tab-pane label="手机号登录" name="手机号登录">
-                <el-form ref="form" :model="form2" class="mt-4">
-                  <el-form-item>
-                    <el-input v-model="form2.phone" prefix-icon="el-icon-user" clearable></el-input>
-                  </el-form-item>
-                  <el-form-item>
-                    <el-input
-                      v-model="form2.verification"
-                      prefix-icon="el-icon-message"
-                      style="width: 260px;"
-                      clearable
-                    ></el-input>
-                    <el-button style="float: right;">获取验证码</el-button>
-                  </el-form-item>
-                  <el-form-item>
-                    <!-- `checked` 为 true 或 false -->
-                    <el-checkbox v-model="checked2">自动登录</el-checkbox>
-                    <el-link type="primary" :underline="false" style="float: right;">忘记密码？</el-link>
-                  </el-form-item>
-                  <el-form-item class="text-center">
-                    <el-button type="primary" style="width: 100%" @click="login2()">登录</el-button>
-                  </el-form-item>
-                </el-form>
-              </el-tab-pane>
             </el-tabs>
             <div>
               <span style="float: left;">其它登录方式</span>
@@ -104,15 +80,6 @@
               </el-form-item>
               <el-form-item>
                 <el-input v-model="form3.password2" placeholder="确认密码" clearable show-password></el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-input placeholder="11位手机号" v-model="form3.phone">
-                  <template slot="prepend">+86</template>
-                </el-input>
-              </el-form-item>
-              <el-form-item>
-                <el-input v-model="form3.verification" style="width: 260px;" clearable></el-input>
-                <el-button style="float: right;">获取验证码</el-button>
               </el-form-item>
               <el-form-item>
                 <el-checkbox v-model="checked1">自动登录</el-checkbox>
@@ -191,7 +158,7 @@ export default {
         .then(res => {
           if (res.data) {
             this.$cookie.setCookie("user", JSON.stringify(res.data));
-            this.$router.push({path:'/tourism'});
+            this.$router.push({ path: "/tourism/user/user-list" });
           } else {
             this.warning("账号或密码错误！");
           }

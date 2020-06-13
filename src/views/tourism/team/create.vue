@@ -14,7 +14,11 @@
       </el-table-column>
       <el-table-column label="操作" prop="termName" width="200px">
         <template slot-scope="scope">
-          <el-button type="warning" @click="endTerm(scope.row.termId)" :disabled="scope.row.status == 2">结束行程</el-button>
+          <el-button
+            type="warning"
+            @click="endTerm(scope.row.termId)"
+            :disabled="scope.row.status == 2"
+          >结束行程</el-button>
         </template>
       </el-table-column>
     </el-table>

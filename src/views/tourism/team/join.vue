@@ -17,7 +17,7 @@
       <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
           <el-button v-show="scope.row.status == 0">接受邀请</el-button>
-          <el-button v-show="scope.row.status == 2">打印账单</el-button>
+          <el-button v-show="scope.row.status == 2" @click="print(scope.row.id)">打印账单</el-button>
           <span v-show="scope.row.status == 1">无可用操作</span>
         </template>
       </el-table-column>
@@ -32,6 +32,20 @@ export default {
     };
   },
   methods: {
+    print(id) {
+      //excel数据导出
+      require.ensure([], () => {
+        const { export_json_to_excel } = require("@/assets/js/Export2Excel");
+        const tHeader = ["序号", "姓名", "用户名", "性别", "邮箱"];
+        const filterVal = ["userId", "name", "username", "sex", "email"];
+        const list = this.users;
+        const data = this.formatJson(filterVal, list);
+        export_json_to_excel(tHeader, data, "用户列表");
+      });
+    },
+    formatJson(filterVal, jsonData) {
+      return jsonData.map(v => filterVal.map(j => v[j]));
+    },
     loadMyJoinList() {
       this.$http
         .get("termRecord/" + JSON.parse(this.$cookie.getCookie("user")).id)

@@ -29,7 +29,7 @@
           <el-col :span="12">
             <el-button type="primary" @click="search()">搜索</el-button>
             <el-button type="primary" @click="reset()">重置</el-button>
-            <el-button type="success" @click="show()">添加</el-button>
+            <el-button type="success" @click="show()" v-show="admin()">添加</el-button>
           </el-col>
         </el-row>
       </div>
@@ -45,9 +45,9 @@
         <el-table-column label="出生日期">
           <template slot-scope="scope">{{ scope.row.brithday | dateformat}}</template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column  label="操作">
           <template slot-scope="scope">
-            <span>
+            <span v-show="admin()">
               <el-button size="mini" type="primary" @click="show(scope.row.id)">修改</el-button>
               <el-button size="mini" type="danger" @click="handleDel(scope.row.id)">删除</el-button>
             </span>
@@ -125,6 +125,13 @@ export default {
     };
   },
   methods: {
+    admin() {
+      if (JSON.parse(this.$cookie.getCookie("user")).level == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     handleDel(id) {
       this.$http.delete("agency/" + id).then(res => {
         if (res.data) {

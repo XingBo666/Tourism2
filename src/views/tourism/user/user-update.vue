@@ -18,12 +18,14 @@
                 <el-option :label="'女'" :value="0"></el-option>
               </el-select>
             </el-form-item>
+            <el-form-item label="密码">
+              <el-input v-model="form.password" type="password" />
+            </el-form-item>
+            <el-form-item label="确认密码">
+              <el-input v-model="repass" type="password" />
+            </el-form-item>
             <el-form-item label="出生日期">
-              <el-date-picker
-                v-model="form.brithday"
-                type = "date"
-                placeholder="选择日期"
-              ></el-date-picker>
+              <el-date-picker v-model="form.brithday" type="date" placeholder="选择日期"></el-date-picker>
             </el-form-item>
 
             <el-form-item class="text-center mt-5">
@@ -51,8 +53,10 @@ export default {
         name: "",
         nickName: "",
         sex: null,
-        brithday: null
-      }
+        brithday: null,
+        password: ""
+      },
+      repass: ""
     };
   },
   methods: {
@@ -70,12 +74,17 @@ export default {
         this.form.name == "" ||
         this.form.nickName == "" ||
         this.form.sex == null ||
-        this.form.brithday == null
+        this.form.brithday == null ||
+        this.form.password == null
       ) {
         return this.$message.error("还有信息未填写");
       }
+
+      if (this.form.password !== this.repass) {
+        return this.$message.error("两次输入的密码不一致");
+      }
       this.$http
-        .put("agency",this.form)
+        .put("agency", this.form)
         .then(res => {
           if (res.data) {
             this.$message.success("修改成功");

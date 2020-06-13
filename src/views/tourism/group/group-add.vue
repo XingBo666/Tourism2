@@ -20,17 +20,13 @@
                   <el-input type="textarea" v-model="form.desc"></el-input>
                 </el-form-item>
                 <el-form-item label="出发日期">
-                  <el-date-picker
-                    v-model="form.date"
-                    type="datetime"
-                    placeholder="选择日期时间"
-                  ></el-date-picker>
+                  <el-date-picker v-model="form.date" type="datetime" placeholder="选择日期时间"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="总预算">
-                  <el-input v-model="form.money" size="medium" placeholder></el-input>
+                  <el-input v-model="form.money" :maxlength="9" size="medium" placeholder></el-input>
                 </el-form-item>
                 <el-form-item label="个人预算">
-                  <el-input v-model="form.money2" size="medium" placeholder></el-input>
+                  <el-input v-model="form.money2" :maxlength="9" size="medium" placeholder></el-input>
                 </el-form-item>
 
                 <el-form-item class="mt-5">
@@ -63,7 +59,7 @@
               <p>
                 转账金额：
                 <span style="font-size: 24px;">{{form.money}}</span>
-                <span style = "font-size: 26px;margin-left: 10px;">元</span>
+                <span style="font-size: 26px;margin-left: 10px;">元</span>
               </p>
               <el-divider></el-divider>
               <el-form ref="form" :model="form3" label-width="70px">
@@ -92,7 +88,7 @@
               <p>
                 转账金额：
                 <span style="font-size: 24px; margin-right: 5px;">{{form.money}}</span>
-                <span style = "font-size: 26px;margin-left: 10px;"></span>
+                <span style="font-size: 26px;margin-left: 10px;"></span>
               </p>
               <el-button
                 type="primary"
@@ -150,7 +146,7 @@ export default {
   methods: {
     submit() {
       if (this.form3.password !== "") {
-        this.$http.post('termRecord',)
+        this.$http.post("termRecord");
         this.$message.success("提交成功");
         this.isSuccess = true;
       } else {
@@ -173,7 +169,7 @@ export default {
           startTime: this.form.date,
           totalBudget: this.form.money,
           personBudget: this.form.money2,
-          createId: JSON.parse(this.$cookie.getCookie('user')).id
+          createId: JSON.parse(this.$cookie.getCookie("user")).id
         })
         .then(res => {
           if (res.data) {
