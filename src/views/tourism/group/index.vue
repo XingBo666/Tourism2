@@ -13,36 +13,38 @@
             </el-card>
           </router-link>
         </el-col>
-        <el-col :span="6" v-for="index in data" :key="index.id" class="mt-5">
+        <el-col :span="6" v-for="item in termList" :key="item.id" class="mt-5">
           <el-card shadow="always">
-            <div style="background-color: #343a40; width: 30px; height: 30px; border-radius: 50%; padding: 10px; float: left;">
+            <div
+              style="background-color: #343a40; width: 30px; height: 30px; border-radius: 50%; padding: 10px; float: left;"
+            >
               <i class="el-icon-s-promotion" style="font-size: 30px; color: white;"></i>
             </div>
             <div style="margin-left: 60px;">
-              <p class="mt-0 mb-2">发起人：{{index.user}}</p>
-              <p class="mt-0 mb-2">活动内容：{{index.desc}}</p>
-              <p class="mt-0 mb-2">起始时间：{{index.date}}</p>
-              <p class="mt-0 mb-2">个人预算：{{index.money}}</p>
+              <p class="mt-0 mb-2">发起人：{{item.createName}}</p>
+              <p class="mt-0 mb-2">活动内容：{{item.content}}</p>
+              <p class="mt-0 mb-2">起始时间：{{item.startTime.substring(0,10)}}</p>
+              <p class="mt-0 mb-2">个人预算：{{item.personBudget}}</p>
             </div>
             <div style="border: .5px solid #E4E7ED; margin-top: 20px; margin-bottom: 10px;"></div>
             <div class="text-center">
               <el-link
+                v-show="MyTerm( item.createId)"
                 type="primary"
                 size="medium"
-                @click="addTeam(index.id)"
-                plain>加入</el-link>
+                @click="addTeam(item.id)"
+                plain
+              >加入</el-link>
+              <span style="color: red" v-show="MyTerm(item.id)">您是创建者</span>
             </div>
           </el-card>
         </el-col>
       </el-row>
     </el-card>
-    <el-dialog
-      title="创建队伍"
-      :visible.sync="dialogVisible"
-      width="30%">
+    <el-dialog title="创建队伍" :visible.sync="dialogVisible" width="30%">
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label="发起人">
-          <el-input v-model="form.user" size="medium" placeholder=""></el-input>
+          <el-input v-model="form.user" size="medium" placeholder></el-input>
         </el-form-item>
         <el-form-item label="活动内容">
           <el-input type="textarea" v-model="form.desc"></el-input>
@@ -53,11 +55,11 @@
             type="datetime"
             format="yyyy.MM.dd"
             value-format="yyyy.MM.dd"
-            placeholder="选择日期时间">
-          </el-date-picker>
+            placeholder="选择日期时间"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label="预算">
-          <el-input v-model="form.money" size="medium" placeholder=""></el-input>
+          <el-input v-model="form.money" size="medium" placeholder></el-input>
         </el-form-item>
 
         <el-form-item class="text-right">
@@ -69,81 +71,72 @@
 </template>
 
 <script>
-  import Breadcrumb from '@/components/Breadcrumb'
+import Breadcrumb from "@/components/Breadcrumb";
 
-  export default {
-    name: "user-update",
-    components:{
-      Breadcrumb,
-    },
-    data() {
-      return {
-        data: [],
-        form: {
-          user: '',
-          date: '',
-          desc: '',
-          money: '',
-        },
-        dialogVisible: false
-      }
-    },
-    mounted() {
-      this.list();
-    },
-    methods: {
-      addTeam(index) {
-
-        let id;
-        for (let i=0; i<this.data.length; i++) {
-          if (this.data[i].id === index) {
-            id = i;
-            break;
-          }
-        }
-
-        let groupInfo = {
-          'id': this.data[id].id,
-          'user': this.data[id].user,
-          'date': this.data[id].date,
-          'desc': this.data[id].desc,
-          'money': this.data[id].money,
-        };
-
-        this.$cookie.setCookie('groupInfo', JSON.stringify(groupInfo));
-        this.$router.push({path:'/tourism/group/group-add'});
+export default {
+  name: "user-update",
+  components: {
+    Breadcrumb
+  },
+  data() {
+    return {
+      data: [],
+      form: {
+        user: "",
+        date: "",
+        desc: "",
+        money: ""
       },
-      list() {
-        let postData = {
-          'id': 0,
-          'user': '黄老师',
-          'date': '2020.06.07',
-          'desc': '北京',
-          'money': '3000',
-        };
-        let postData2 = {
-          'id': 1,
-          'user': '何老师',
-          'date': '2020.06.07',
-          'desc': '湖南',
-          'money': '6000',
-        };
-        let postData3 = {
-          'id': 2,
-          'user': '周老师',
-          'date': '2020.06.07',
-          'desc': '湖北',
-          'money': '9000',
-        };
-
-        this.data.splice(0, 0, postData);
-        this.data.splice(0, 0, postData2);
-        this.data.splice(0, 0, postData3);
+      dialogVisible: false,
+      termList: []
+    };
+  },
+  methods: {
+    MyTerm(id) {
+      if (JSON.parse(this.$cookie.getCookie("user")).id == id) {
+        return false;
       }
+      return true;
+    },
+    addTeam(index) {
+      let id;
+      for (let i = 0; i < this.termList.length; i++) {
+        if (this.termList[i].id === index) {
+          id = i;
+          break;
+        }
+      }
+
+      let groupInfo = {
+        id: this.termList[id].id,
+        user: this.termList[id].createName,
+        date: this.termList[id].startTime,
+        desc: this.termList[id].content,
+        money: this.termList[id].personBudget
+      };
+
+      this.$cookie.setCookie("groupInfo", JSON.stringify(groupInfo));
+      this.$router.push({ path: "/tourism/group/group-add" });
+    },
+    loadTermList() {
+      this.$http
+        .get("term/list")
+        .then(res => {
+          this.termList = res.data;
+        })
+        .catch(err => {
+          if (err.response) {
+            this.$message.error("暂时还没有未开始的活动");
+            this.termList = [];
+          }
+        });
     }
+  },
+  created() {
+    this.loadTermList();
   }
+};
 </script>
 
 <style scoped>
-
 </style>

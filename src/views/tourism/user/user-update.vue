@@ -10,22 +10,20 @@
               <el-input v-model="form.name" clearable></el-input>
             </el-form-item>
             <el-form-item label="用户名">
-              <el-input v-model="form.user" clearable></el-input>
+              <el-input v-model="form.nickName" clearable></el-input>
             </el-form-item>
             <el-form-item label="性别">
-              <el-radio-group v-model="form.gender">
-                <el-radio label="男"></el-radio>
-                <el-radio label="女"></el-radio>
-              </el-radio-group>
+              <el-select v-model="form.sex">
+                <el-option :label="'男'" :value="1"></el-option>
+                <el-option :label="'女'" :value="0"></el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="出发日期">
+            <el-form-item label="出生日期">
               <el-date-picker
-                v-model="form.date"
-                type="date"
-                format="yyyy.MM.dd"
-                value-format="yyyy.MM.dd"
-                placeholder="选择日期">
-              </el-date-picker>
+                v-model="form.brithday"
+                type = "date"
+                placeholder="选择日期"
+              ></el-date-picker>
             </el-form-item>
 
             <el-form-item class="text-center mt-5">
@@ -40,48 +38,65 @@
 </template>
 
 <script>
-  import Breadcrumb from '@/components/Breadcrumb'
+import Breadcrumb from "@/components/Breadcrumb";
 
-    export default {
-      name: "user-update",
-      components:{
-        Breadcrumb,
-      },
-      data() {
-        return {
-          form: {
-            name: '',
-            user: '',
-            gender: '男',
-            date: '',
-          },
-        }
-      },
-      methods: {
-        submit() {
-          if (this.form.name !== '') {
-            if (this.form.user !== '') {
-              if (this.form.gender !== '') {
-                if (this.form.date !== '') {
-                  this.$message.success('提交成功');
-                } else {
-                  this.$message.warning('时间不能为空！');
-                }
-              } else {
-                this.$message.warning('性别不能为空！');
-              }
-            } else {
-              this.$message.warning('用户名不能为空！');
-            }
-          } else {
-            this.$message.warning('真实姓名不能为空！');
-          }
-        },
-
+export default {
+  name: "user-update",
+  components: {
+    Breadcrumb
+  },
+  data() {
+    return {
+      form: {
+        name: "",
+        nickName: "",
+        sex: null,
+        brithday: null
       }
+    };
+  },
+  methods: {
+    loadUserData() {
+      console.log(JSON.parse(this.$cookie.getCookie("user")).id);
+      this.$http
+        .get("agency/" + JSON.parse(this.$cookie.getCookie("user")).id)
+        .then(res => {
+          this.form = res.data;
+          console.log(this.form);
+        });
+    },
+    submit() {
+      if (
+        this.form.name == "" ||
+        this.form.nickName == "" ||
+        this.form.sex == null ||
+        this.form.brithday == null
+      ) {
+        return this.$message.error("还有信息未填写");
+      }
+      this.$http
+        .put("agency",this.form)
+        .then(res => {
+          if (res.data) {
+            this.$message.success("修改成功");
+            this.loadUserData();
+          } else {
+            this.$message.error("修改失败，请联系开发人员");
+          }
+        })
+        .catch(err => {
+          if (err.response) {
+            this.$message.error("修改失败，请检查参数");
+          }
+        });
     }
+  },
+  created() {
+    console.log(1);
+    this.loadUserData();
+  }
+};
 </script>
 
 <style scoped>
-
 </style>

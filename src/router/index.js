@@ -49,6 +49,10 @@ export default new Router({
           path: '/tourism/team/index',
           name: '团队活动',
           component: () => import('@/views/tourism/team/index'),
+          children: [
+            { path: 'join', name: '我参与的活动', component: () => import('@/views/tourism/team/join') },
+            { path: 'create', name: '我创建的活动', component: () => import('@/views/tourism/team/create') }
+          ]
         },
       ]
     },

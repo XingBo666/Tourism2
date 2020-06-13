@@ -5,9 +5,15 @@ import router from './router'
 
 Vue.config.productionTip = false;
 
-import {get, post} from "./assets/js/axios.js";  // 引入axios 的 get，post 方法
-Vue.prototype.$get = get;
-Vue.prototype.$post = post;
+// import {get, post} from "./assets/js/axios.js";  // 引入axios 的 get，post 方法
+// Vue.prototype.$get = get;
+// Vue.prototype.$post = post;
+
+import Axios from 'axios'
+
+
+Vue.prototype.$http = Axios
+Axios.defaults.baseURL = "http://localhost:8000"
 
 import  "./assets/css/general.css"  // 引入全局通用样式
 import "./assets/css/global.css"  // 引入全局公共样式
