@@ -55,17 +55,6 @@ export default {
     };
   },
   methods: {
-    exportTable() {
-      //导出excel
-      require.ensure([], () => {
-        const { export_json_to_excel } = require("@/assets/js/Export2Excel"); //引入js文件
-        const tHeader = ["日期", "姓名", "地址"]; //table的表头数据，导出后为excel第一行
-        const filterVal = ["date", "name", "address"]; //table数据的prop关键字，后面循环要用到
-        const list = this.tableData; //this.tableData是我的初始填入数据，这里以element-ui的表格为例
-        const data = this.formatJson(filterVal, list); //循环重组数据
-        export_json_to_excel(tHeader, data, "excel文件名");
-      });
-    },
     formatJson(filterVal, jsonData) {
       //循环重组数据
       return jsonData.map(v => filterVal.map(j => v[j]));
