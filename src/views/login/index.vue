@@ -66,11 +66,17 @@
           <!-- 登录模块 -->
           <div style="padding: 20px 30px;" v-show="!show_login">
             <h2 class="text-center">会员注册</h2>
-            <el-form ref="form" :model="form3" class="mt-4">
-              <el-form-item>
-                <el-input v-model="form3.user" placeholder="邮箱" type="email" clearable></el-input>
+            <el-form ref="form" :model="form3" class="mt-4" label-width="80px">
+              <el-form-item label="邮箱">
+                <el-input v-model="form3.email" placeholder="邮箱" type="email" clearable></el-input>
               </el-form-item>
-              <el-form-item>
+              <el-form-item label="手机号">
+                <el-input v-model="form3.phone" placeholder="手机号" type="phone" clearable></el-input>
+              </el-form-item>
+              <el-form-item label="昵称">
+                <el-input v-model="form3.nickName" placeholder="昵称" type="nickName" clearable></el-input>
+              </el-form-item>
+              <el-form-item label="密码">
                 <el-input
                   v-model="form3.password"
                   placeholder="6~16位密码，区分大小写"
@@ -78,8 +84,8 @@
                   show-password
                 ></el-input>
               </el-form-item>
-              <el-form-item>
-                <el-input v-model="form3.password2" placeholder="确认密码" clearable show-password></el-input>
+              <el-form-item label="确认密码">
+                <el-input v-model="repass" placeholder="确认密码" clearable show-password></el-input>
               </el-form-item>
               <el-form-item>
                 <el-checkbox v-model="checked1">自动登录</el-checkbox>
@@ -124,12 +130,12 @@ export default {
       checked1: "",
       checked2: "",
       form3: {
-        user: "",
+        nickName: "",
         password: "",
-        password2: "",
-        phone: "",
-        verification: ""
+        email: "",
+        phone: ""
       },
+      repass: "",
       show_login: true
     };
   },
@@ -169,44 +175,43 @@ export default {
           }
         });
     },
-    login2() {
-      if (this.form2.phone === "10086" && this.form2.verification === "1111") {
-        let userInfo = {
-          name: "管理员"
-        };
-        this.$cookie.setCookie("user", JSON.stringify(userInfo));
-        this.$router.push({ path: "/tourism" });
-      } else {
-        this.warning("账号或密码错误！");
-      }
-    },
     registered() {
-      if (this.form3.user !== "") {
-        if (this.form3.password !== "") {
-          if (this.form3.password === this.foem3.password2) {
-            if (this.form3.phone !== "") {
-              if (this.form3.verification !== "") {
-                let userInfo = {
-                  name: "管理员"
-                };
-                this.$message.success("注册成功");
-                this.$cookie.setCookie("user", JSON.stringify(userInfo));
-                this.$router.push({ path: "/tourism" });
-              } else {
-                this.warning("验证码不能为空！");
-              }
-            } else {
-              this.warning("手机号不能为空！");
-            }
-          } else {
-            this.warning("两次密码不匹配！");
-          }
-        } else {
-          this.warning("密码不能为空！");
-        }
-      } else {
-        this.warning("邮箱不能为空！");
+      if (
+        this.form3.nickName == "" ||
+        this.form3.password == "" ||
+        this.form3.email == "" ||
+        this.form3.phone == ""
+      ) {
+        return this.$message.error("您还有信息没有输入，请再试");
       }
+      if (this.form3.password.length < 5) {
+        return this.$message.error("密码的长度在5位以上");
+      }
+      if (this.form3.password != this.repass) {
+        return this.$message.error("两次密码不一致");
+      }
+
+      this.$http
+        .post("agency/registry", this.form3)
+        .then(res => {
+          if (res.data) {
+            this.$message.success("注册成功");
+            setTimeout(() => {
+              this.form.user = this.form3.nickName;
+              this.form.password = this.form3.password;
+              this.login();
+            });
+          } else {
+            this.$message.error("注册失败，请联系开发人员");
+          }
+        })
+        .catch(err => {
+          if (err.response) {
+            this.$message.error("注册失败，请检查参数");
+          }
+        });
+
+      console.log(this.form3);
     },
     warning(text) {
       this.$notify({

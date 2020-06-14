@@ -89,6 +89,7 @@ export default {
           if (res.data) {
             this.$message.success("修改成功");
             this.loadUserData();
+            this.$router.push("/tourism/user/user-list");
           } else {
             this.$message.error("修改失败，请联系开发人员");
           }

@@ -39,8 +39,15 @@
           <el-row type="flex" class="row-bg" justify="center" v-show="active === 2">
             <el-col :span="16">
               <el-form ref="form" :model="form2" label-width="150px">
-                <el-form-item label="待邀请成员邮箱">
-                  <el-input v-model="form2.email" size="medium" placeholder></el-input>
+                <el-form-item label="待邀请成员">
+                  <el-select v-model="invitedList" multiple placeholder="请选择">
+                    <el-option
+                      v-for="item in agencyList"
+                      :key="item.id"
+                      :label="item.nickName"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select>
                 </el-form-item>
 
                 <el-form-item class="mt-5">
@@ -63,12 +70,18 @@
               </p>
               <el-divider></el-divider>
               <el-form ref="form" :model="form3" label-width="70px">
-                <el-form-item label="支付密码">
-                  <el-input v-model="form3.password" size="medium" placeholder></el-input>
+                <el-form-item>
+                  <!--放置一个二维码-->
+                  <img src="@/assets/1.png" />
                 </el-form-item>
 
                 <el-form-item class="mt-5">
-                  <el-button type="primary" size="medium" style="width: 200px;" @click="submit()">提交</el-button>
+                  <el-button
+                    type="primary"
+                    size="medium"
+                    style="width: 200px;"
+                    @click="submit()"
+                  >我已支付，下一步</el-button>
                 </el-form-item>
               </el-form>
             </el-col>
@@ -115,6 +128,7 @@ export default {
   },
   data() {
     return {
+      termId: null,
       form: {
         user: "",
         date: "",
@@ -129,7 +143,10 @@ export default {
         password: ""
       },
       active: 1,
-      isSuccess: false
+      isSuccess: false,
+      agencyList: [],
+      invitedList: [],
+      iList: []
     };
   },
   mounted() {
@@ -144,14 +161,41 @@ export default {
     }
   },
   methods: {
+    loadAgencyList() {
+      this.$http
+        .get("agency/all")
+        .then(res => {
+          this.agencyList = res.data;
+        })
+        .catch(err => {
+          if (err.response) {
+            this.agencyList = [];
+          }
+        });
+    },
     submit() {
-      if (this.form3.password !== "") {
-        this.$http.post("termRecord");
-        this.$message.success("提交成功");
-        this.isSuccess = true;
-      } else {
-        this.$message.warning("支付密码不能为空！");
-      }
+      //  发送请求，添加一条记录
+      console.log(JSON.parse(this.$cookie.getCookie("user")).id);
+      console.log(JSON.parse(this.$cookie.getCookie("groupInfo")));
+      this.$http
+        .post("term/join", {
+          agencyId: JSON.parse(this.$cookie.getCookie("user")).id,
+          termId: JSON.parse(this.$cookie.getCookie("groupInfo")).id
+        })
+        .then(res => {
+          if (res.data) {
+            this.isSuccess = true;
+          } else {
+            this.$message.error("加入队伍失败，请联系开发人员");
+            this.isSuccess = true;
+          }
+        })
+        .catch(err => {
+          if (err.response) {
+            this.$message.error("加入队伍失败，请联系开发人员");
+            this.isSuccess = true;
+          }
+        });
     },
     next() {
       if (
@@ -172,7 +216,8 @@ export default {
           createId: JSON.parse(this.$cookie.getCookie("user")).id
         })
         .then(res => {
-          if (res.data) {
+          if (res.data != 0 && res.data != null) {
+            this.termId = res.data;
             this.active = 2;
           } else {
             this.$message.error("团队创建失败，请联系开发人员");
@@ -185,11 +230,38 @@ export default {
         });
     },
     next2() {
-      if (this.form2.email !== "") {
-        this.active = 3;
-      } else {
-        this.$message.warning("待邀请成员邮箱不能为空！");
+      if (this.invitedList == []) {
+        return (this.active = 3);
       }
+      for (let i = 0; i < this.invitedList.length; i++) {
+        console.log(this.invitedList[i]);
+
+        this.iList[i] = this.invitedList[i];
+      }
+
+      setTimeout(() => {
+        this.$http
+          .post("termRecord/invite", {
+            termId: this.termId,
+            agencies: this.iList
+          })
+          .then(res => {
+            if (res.data) {
+              this.$message.success("邀请成功");
+              setTimeout(() => {
+                this.active = 3;
+              }, 500);
+            }
+          })
+          .catch(err => {
+            if (err.response) {
+              this.$message("邀请失败，请联系管理员");
+              setTimeout(() => {
+                this.active = 3;
+              }, 500);
+            }
+          });
+      }, 500);
     },
     returnSuccess() {
       this.active = 1;
@@ -200,7 +272,11 @@ export default {
       this.form.money2 = "";
       this.isSuccess = false;
       this.$cookie.delCookie("groupInfo");
+      this.$router.push("/tourism/team/index/join");
     }
+  },
+  created() {
+    this.loadAgencyList();
   }
 };
 </script>

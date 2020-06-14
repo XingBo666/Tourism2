@@ -35,7 +35,7 @@
                 @click="addTeam(item.id)"
                 plain
               >加入</el-link>
-              <span style="color: red" v-show="MyTerm(item.id)">您是创建者</span>
+              <span style="color: red" v-show="!MyTerm(item.createId)">您是创建者</span>
             </div>
           </el-card>
         </el-col>
