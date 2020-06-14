@@ -174,9 +174,9 @@ export default {
         });
     },
     submit() {
-      //  发送请求，添加一条记录
-      console.log(JSON.parse(this.$cookie.getCookie("user")).id);
-      console.log(JSON.parse(this.$cookie.getCookie("groupInfo")));
+      if (this.$cookie.getCookie("groupInfo") == null || this.$cookie.getCookie("groupInfo")=='') {
+        return this.isSuccess = true;
+      }
       this.$http
         .post("term/join", {
           agencyId: JSON.parse(this.$cookie.getCookie("user")).id,

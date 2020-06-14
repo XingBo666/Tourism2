@@ -16,7 +16,7 @@
       </el-table-column>
       <el-table-column label="操作" width="300px">
         <template slot-scope="scope">
-          <el-button v-show="scope.row.status == 0">接受邀请</el-button>
+          <!-- <el-button v-show="scope.row.status == 0" @click = "okInvite(scope.row.id)">接受邀请</el-button> -->
           <el-button v-show="scope.row.status == 2" @click="print(scope.row.termId)">打印此次账单</el-button>
           <span v-show="scope.row.status == 1">无可用操作</span>
         </template>
